@@ -28,6 +28,7 @@ def input_thread(data: VehicleData, ui: SDV_UI):
         "hazard": "Vehicle.Body.Lights.Hazard.IsSignaling",
         "left": "Vehicle.Body.Lights.DirectionIndicator.Left.IsSignaling",
         "right": "Vehicle.Body.Lights.DirectionIndicator.Right.IsSignaling",
+        "interior_light": "Vehicle.Cabin.Light.AmbientLight.IsLightOn"
     }
 
     # Read-Signals
@@ -85,14 +86,15 @@ def input_thread(data: VehicleData, ui: SDV_UI):
                     pdc_active = bool(getattr(result.get(READ_SIGNALS["pdc_active"]), "value", False))
                     data.set_parksensor_active(pdc_active)
                     dist = float(getattr(result.get(READ_SIGNALS["pdc_distance"]), "value", 0.0)) # in cm
-                    if dist < 50:
-                        data.set_parksensor_level(0)
-                    elif dist < 100:
-                        data.set_parksensor_level(1)
-                    elif dist < 150:
-                        data.set_parksensor_level(2)
-                    elif dist < 200:
+                    data.set_parksensor_distance(int(dist))  # in cm
+                    if dist <= 50:
                         data.set_parksensor_level(3)
+                    elif dist <= 100:
+                        data.set_parksensor_level(2)
+                    elif dist <= 150:
+                        data.set_parksensor_level(1)
+                    else:
+                        data.set_parksensor_level(0)
 
                     # Person Detection
                     person_detected = bool(getattr(result.get(READ_SIGNALS["person_detected"]), "value", False))
@@ -107,6 +109,7 @@ def input_thread(data: VehicleData, ui: SDV_UI):
         data.set_highbeam(ui.highbeam_btn.isChecked())
         data.set_lowbeam(ui.lowbeam_btn.isChecked())
         data.set_standlight(ui.stand_light_btn.isChecked())
+        data.set_interior_light(ui.interiorlight_btn.isChecked())
 
         now = time.time()
 
@@ -139,6 +142,7 @@ def input_thread(data: VehicleData, ui: SDV_UI):
                     SET_SIGNALS["hazard"]: Datapoint(value=data.get_hazard()),
                     SET_SIGNALS["left"]: Datapoint(value=data.get_left_blinker()),
                     SET_SIGNALS["right"]: Datapoint(value=data.get_right_blinker()),
+                    SET_SIGNALS["interior_light"]: Datapoint(value=data.get_interior_light()),
                 })
             except Exception as e:
                 print("⚠️ Fehler beim Publishen an KUKSA:", e)
@@ -153,10 +157,11 @@ def gui_thread(data: VehicleData):
     ui.show()
 
     def update_ui():
-        # Indicators
+        # Indicators & Lights
         ui.highbeam.setVisible(data.get_highbeam())
         ui.lowbeam.setVisible(data.get_lowbeam())
         ui.stand.setVisible(data.get_standlight())
+        ui.interiorlight.setVisible(data.get_interior_light())
         ui.blinker_left.setVisible(data.get_left_blinker() or data.get_hazard())
         ui.blinker_right.setVisible(data.get_right_blinker() or data.get_hazard())
         
@@ -168,13 +173,23 @@ def gui_thread(data: VehicleData):
 
         # Parksensor
         active = data.get_parksensor_active()  
-        level = data.get_parksensor_level()    
+        level = data.get_parksensor_level()  
+        distance = data.get_parksensor_distance()
 
         ui.parksensor_0.setVisible(level == 0 and active)
         ui.parksensor_1.setVisible(level == 1 and active)
         ui.parksensor_2.setVisible(level == 2 and active)
         ui.parksensor_3.setVisible(level == 3 and active)
 
+        ui.update_distance_bar(distance)
+
+        if (level == 3) and active:
+            ui.distance_bar_bg.show()
+            ui.distance_bar_fill.show()
+        else:
+            ui.distance_bar_bg.hide()
+            ui.distance_bar_fill.hide()
+                    
         # Speed
         ui.speed.setText(str(int(data.get_speed())))
 

@@ -54,8 +54,7 @@ class SDV_UI(QWidget):
         self.person_distance_cm.setStyleSheet("color: #fd2d00;")
         self.person_distance_cm.move(310, 442)
         self.person_distance_cm.hide()
-
-        
+                
         # Buttons
         self.blinker_right_btn = self._make_button(876, 306, "icons/blinker_right_button.JPG")
         self.highbeam_btn = self._make_button(876, 452, "icons/highbeam_button.JPG")
@@ -63,6 +62,7 @@ class SDV_UI(QWidget):
         self.lowbeam_btn = self._make_button(730, 452, "icons/lowbeam_button.JPG")
         self.blinker_left_btn = self._make_button(584, 306, "icons/blinker_left_button.JPG")
         self.stand_light_btn = self._make_button(584, 452, "icons/stand_button.JPG")
+        self.interiorlight_btn = self._make_button(438, 452, "icons/interiorlight_button.JPG")
 
         # blinker lights group
         self.blinker_group = [self.blinker_left_btn, self.blinker_right_btn, self.hazard_btn]
@@ -106,6 +106,7 @@ class SDV_UI(QWidget):
         self.stand = self._make_image(876, 8, "icons/stand.JPG") #prev: 584,8
         self.lowbeam = self._make_image(876, 8, "icons/lowbeam.JPG") #prev: 730,8
         self.highbeam = self._make_image(876, 8, "icons/highbeam.JPG")
+        self.interiorlight = self._make_image(730, 8, "icons/interiorlight.JPG")
 
         # Türen
         self.door_both = self._make_image(584, 8, "icons/door_both.JPG") #all prev: 730, 146
@@ -113,12 +114,21 @@ class SDV_UI(QWidget):
         self.door_right = self._make_image(584, 8, "icons/door_right.JPG")
 
         # Parksensoren
-        self.parksensor_0 = self._make_image(8, 380, "icons/parksensor0.jpg")
-        self.parksensor_1 = self._make_image(8, 380, "icons/parksensor1.jpg")
-        self.parksensor_2 = self._make_image(8, 380, "icons/parksensor2.jpg")
-        self.parksensor_3 = self._make_image(8, 380, "icons/parksensor3.jpg")
-        
+        self.parksensor_0 = self._make_image_extend(8, 330, "icons/parksensor0.jpg")
+        self.parksensor_1 = self._make_image_extend(8, 330, "icons/parksensor1.jpg")
+        self.parksensor_2 = self._make_image_extend(8, 330, "icons/parksensor2.jpg")
+        self.parksensor_3 = self._make_image_extend(8, 330, "icons/parksensor3.jpg")
 
+        # --- Distance Bar (50 cm, 1 cm = 1 Pixel) ---
+        self.distance_bar_bg = QLabel(self)
+        self.distance_bar_bg.setGeometry(8, 530, 240, 20)
+        self.distance_bar_bg.setStyleSheet("background-color: #1A1A1A; border-radius: 5px;")
+
+        self.distance_bar_fill = QLabel(self)
+        self.distance_bar_fill.setGeometry(8, 530, 0, 20)
+        self.distance_bar_fill.setStyleSheet("background-color: #fd2d00; border-radius: 5px;")
+
+        
         # Person
         self.person = self._make_image(150, 380, "icons/person.jpg")
         self.person.hide()
@@ -174,3 +184,26 @@ class SDV_UI(QWidget):
         label.setPixmap(pixmap.scaled(140, 140, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         label.move(x, y)
         return label
+
+    def _make_image_extend(self, x, y, img_path):
+        label = QLabel(self)
+        pixmap = QPixmap(img_path)
+        label.setPixmap(pixmap.scaled(240, 240, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        label.move(x, y)
+        return label
+
+    def update_distance_bar(self, cm):
+        
+        cm = max(0, min(50, cm))
+        if cm < 30:
+            self.distance_bar_fill.setStyleSheet("background-color: #fd2d00; border-radius: 5px;")
+        elif cm < 40:
+            self.distance_bar_fill.setStyleSheet("background-color: #ce7927; border-radius: 5px;")
+        else:
+            self.distance_bar_fill.setStyleSheet("background-color: #9fc54e; border-radius: 5px;")
+
+        max_width = 240
+        # Anteil der letzten 50cm
+        fill_width = int(max_width * cm / 50)
+        self.distance_bar_fill.setGeometry(8, 530, fill_width, 20)
+

@@ -11,6 +11,7 @@ class VehicleData:
         self._left_blinker = False
         self._right_blinker = False
         self._hazard = False
+        self._interior_light = False
 
         # gear and speed
         self._gear = 126
@@ -25,7 +26,8 @@ class VehicleData:
 
         # Parksensor
         self._parksensor_active = False
-        self._parksensor_level = 0;
+        self._parksensor_level = 0
+        self._parksensor_distance = 0
 
         # Fuel level
         self._fuel_level = 0
@@ -57,6 +59,14 @@ class VehicleData:
     def get_standlight(self):
         with self._lock:
             return self._standlight
+
+    def set_interior_light(self, value: bool):
+        with self._lock:
+            self._interior_light = value
+
+    def get_interior_light(self):
+        with self._lock:
+            return self._interior_light
 
     def set_left_blinker(self, value: bool):
         with self._lock:
@@ -137,6 +147,14 @@ class VehicleData:
     def get_parksensor_active(self):
         with self._lock:
             return self._parksensor_active
+
+    def set_parksensor_distance(self, value: int):
+        with self._lock:
+            self._parksensor_distance = value
+
+    def get_parksensor_distance(self):
+        with self._lock:
+            return self._parksensor_distance
 
     def set_fuel_level(self, level: int):
         with self._lock:
