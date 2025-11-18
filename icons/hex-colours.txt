@@ -1,0 +1,3 @@
+red: #fd2d00
+
+background: #121212
