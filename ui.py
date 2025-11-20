@@ -6,8 +6,8 @@ from PySide6.QtCore import Qt, QSize
 class SDV_UI(QWidget):
     def __init__(self):
         super().__init__()
-
-        self.setWindowTitle("SDV Dashboard")
+        
+        self.setWindowTitle("SDV UI")
         self.setStyleSheet("background-color: #121212;")
         self.setFixedSize(1024, 600)
         #self.setWindowFlags(Qt.FramelessWindowHint) # optional: frameless window
@@ -31,28 +31,37 @@ class SDV_UI(QWidget):
         self.gear.setAlignment(Qt.AlignCenter)
         self.gear.setGeometry(50, 180, 300, 60)
 
-        # Fuel range
-        self.fuel_range = QLabel("0", self)
-        self.fuel_range.setFont(QFont("Tahoma", 35))
-        self.fuel_range.setStyleSheet("color: white;")
-        self.fuel_range.move(800, 146) # anpassen
-        self.fuel_range_km = QLabel("km", self)
-        self.fuel_range_km.setFont(QFont("Tahoma", 25))
-        self.fuel_range_km.setStyleSheet("color: white;")
-        self.fuel_range_km.move(930, 146) #anpassen vielleicht auch tank dann weiter links
+        # Car information: range or odometer
+        # Label
+        self.info_label = QLabel("Information:", self)
+        self.info_label.setFont(QFont("Tahoma", 25))
+        self.info_label.setStyleSheet("color: white;")
+        self.info_label.setAlignment(Qt.AlignLeft)
+        self.info_label.move(660, 161)
+        # Number
+        self.info = QLabel("0000000", self)
+        self.info.setFont(QFont("Tahoma", 25))
+        self.info.setStyleSheet("color: white;")
+        self.info.setAlignment(Qt.AlignCenter)
+        self.info.move(680, 226) # anpassen
+        # Unit
+        self.info_km = QLabel("km", self)
+        self.info_km.setFont(QFont("Tahoma", 15))
+        self.info_km.setStyleSheet("color: white;")
+        self.info_km.move(810, 241) #anpassen vielleicht auch tank dann weiter links
 
         # Person AI distance
-        self.person_distance = QLabel("000", self)
-        self.person_distance.setFont(QFont("Tahoma", 35))
+        self.person_distance = QLabel("0000", self)
+        self.person_distance.setFont(QFont("Tahoma", 25))
         self.person_distance.setStyleSheet("color: #fd2d00;")
         self.person_distance.setAlignment(Qt.AlignCenter)
-        self.person_distance.setGeometry(215, 428, 100, 50)
+        self.person_distance.move(240, 530)
         self.person_distance.hide()
 
         self.person_distance_cm = QLabel("cm", self)
-        self.person_distance_cm.setFont(QFont("Tahoma", 25))
+        self.person_distance_cm.setFont(QFont("Tahoma", 15))
         self.person_distance_cm.setStyleSheet("color: #fd2d00;")
-        self.person_distance_cm.move(310, 442)
+        self.person_distance_cm.move(315, 545)
         self.person_distance_cm.hide()
                 
         # Buttons
@@ -64,6 +73,8 @@ class SDV_UI(QWidget):
         self.stand_light_btn = self._make_button(584, 452, "icons/stand_button.JPG")
         self.interiorlight_btn = self._make_button(438, 452, "icons/interiorlight_button.JPG")
 
+        self.information_btn = self._make_button_noswitch(438, 306, "icons/information.JPG")
+        
         # blinker lights group
         self.blinker_group = [self.blinker_left_btn, self.blinker_right_btn, self.hazard_btn]
 
@@ -130,21 +141,21 @@ class SDV_UI(QWidget):
 
         
         # Person
-        self.person = self._make_image(150, 380, "icons/person.jpg")
+        self.person = self._make_image_extend(150, 380, "icons/person.jpg")
         self.person.hide()
 
-        # Tank
-        self.fuel10 = self._make_image(730, 146, "icons/fuel10.jpg")
-        self.fuel9 = self._make_image(730, 146, "icons/fuel9.jpg")
-        self.fuel8 = self._make_image(730, 146, "icons/fuel8.jpg")
-        self.fuel7 = self._make_image(730, 146, "icons/fuel7.jpg")
-        self.fuel6 = self._make_image(730, 146, "icons/fuel6.jpg")
-        self.fuel5 = self._make_image(730, 146, "icons/fuel5.jpg")
-        self.fuel4 = self._make_image(730, 146, "icons/fuel4.jpg")
-        self.fuel3 = self._make_image(730, 146, "icons/fuel3.jpg")
-        self.fuel2 = self._make_image(730, 146, "icons/fuel2.jpg")
-        self.fuel1 = self._make_image(730, 146, "icons/fuel1.jpg")
-        self.fuel0 = self._make_image(730, 146, "icons/fuel0.jpg")
+        # Fuel
+        self.fuel10 = self._make_image(520, 156, "icons/fuel10.jpg")
+        self.fuel9 = self._make_image(520, 156, "icons/fuel9.jpg")
+        self.fuel8 = self._make_image(520, 156, "icons/fuel8.jpg")
+        self.fuel7 = self._make_image(520, 156, "icons/fuel7.jpg")
+        self.fuel6 = self._make_image(520, 156, "icons/fuel6.jpg")
+        self.fuel5 = self._make_image(520, 156, "icons/fuel5.jpg")
+        self.fuel4 = self._make_image(520, 156, "icons/fuel4.jpg")
+        self.fuel3 = self._make_image(520, 156, "icons/fuel3.jpg")
+        self.fuel2 = self._make_image(520, 156, "icons/fuel2.jpg")
+        self.fuel1 = self._make_image(520, 156, "icons/fuel1.jpg")
+        self.fuel0 = self._make_image(520, 156, "icons/fuel0.jpg")
         self.fuel10.hide()
         self.fuel9.hide()
         self.fuel8.hide()
@@ -172,6 +183,26 @@ class SDV_UI(QWidget):
                 border-radius: 10px;
             }
             QPushButton:checked {
+                border: 3px solid #00FFC8;
+                background-color: #1E1E1E;
+            }
+        """)
+        return btn
+
+    def _make_button_noswitch(self, x, y, icon_path):
+        btn = QPushButton(self)
+        btn.setGeometry(x, y, 140, 140)
+        btn.setCheckable(False)
+        btn.setIcon(QIcon(icon_path))
+        btn.setIconSize(QSize(120, 120))
+        btn.setCursor(Qt.PointingHandCursor)
+        btn.setStyleSheet("""
+            QPushButton {
+                background-color: #1A1A1A;
+                border: 2px solid #222;
+                border-radius: 10px;
+            }
+            QPushButton:pressed {
                 border: 3px solid #00FFC8;
                 background-color: #1E1E1E;
             }

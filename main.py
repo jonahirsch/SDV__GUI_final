@@ -37,6 +37,7 @@ def input_thread(data: VehicleData, ui: SDV_UI):
         "gear": "Vehicle.Powertrain.Transmission.CurrentGear", # 0=Neutral, 1/2/..=Forward, -1/-2/..=Reverse, 126=Park, 127=Drive
         "fuel_level": "Vehicle.Powertrain.FuelSystem.RelativeLevel", #fuel level realative (0%-100%)
         "fuel_range": "Vehicle.Powertrain.FuelSystem.Range", #fuel range in m"
+        "odometer": "Vehicle.TraveledDistance", # mileage/odometer
         "door_left": "Vehicle.Cabin.Door.Row1.DriverSide.IsOpen",
         "door_right": "Vehicle.Cabin.Door.Row1.PassengerSide.IsOpen",
         "pdc_active": "Vehicle.ADAS.PDC.Rear.IsActive", 
@@ -68,7 +69,9 @@ def input_thread(data: VehicleData, ui: SDV_UI):
                     fuel_level = float(getattr(result.get(READ_SIGNALS["fuel_level"]), "value", 100.0))
                     data.set_fuel_level(fuel_level)
                     fuel_range = float(getattr(result.get(READ_SIGNALS["fuel_range"]), "value", 0.0))  # in m
-                    data.set_fuel_range(int(fuel_range))  # in m
+                    data.set_fuel_range(fuel_range / 1000)  # from m in km
+                    odometer = float(getattr(result.get(READ_SIGNALS["odometer"]), "value", 0.0))  # in m
+                    data.set_odometer(odometer / 1000)  # from m in km
 
                     # Doors
                     left_open = bool(getattr(result.get(READ_SIGNALS["door_left"]), "value", False))
@@ -110,7 +113,7 @@ def input_thread(data: VehicleData, ui: SDV_UI):
         data.set_lowbeam(ui.lowbeam_btn.isChecked())
         data.set_standlight(ui.stand_light_btn.isChecked())
         data.set_interior_light(ui.interiorlight_btn.isChecked())
-
+        
         now = time.time()
 
         # Blinker with 1.5 Hz
@@ -155,6 +158,8 @@ def gui_thread(data: VehicleData):
     app = QApplication(sys.argv)
     ui = SDV_UI()
     ui.show()
+    # Button Klick -> toggelt info_cnt
+    ui.information_btn.clicked.connect(lambda: data.toggle_info_cnt())
 
     def update_ui():
         # Indicators & Lights
@@ -170,26 +175,7 @@ def gui_thread(data: VehicleData):
         ui.door_both.setVisible(data.get_door_status() == 1)
         ui.door_left.setVisible(data.get_door_status() == 2)
         ui.door_right.setVisible(data.get_door_status() == 3)
-
-        # Parksensor
-        active = data.get_parksensor_active()  
-        level = data.get_parksensor_level()  
-        distance = data.get_parksensor_distance()
-
-        ui.parksensor_0.setVisible(level == 0 and active)
-        ui.parksensor_1.setVisible(level == 1 and active)
-        ui.parksensor_2.setVisible(level == 2 and active)
-        ui.parksensor_3.setVisible(level == 3 and active)
-
-        ui.update_distance_bar(distance)
-
-        if (level == 3) and active:
-            ui.distance_bar_bg.show()
-            ui.distance_bar_fill.show()
-        else:
-            ui.distance_bar_bg.hide()
-            ui.distance_bar_fill.hide()
-                    
+                               
         # Speed
         ui.speed.setText(str(int(data.get_speed())))
 
@@ -209,7 +195,33 @@ def gui_thread(data: VehicleData):
         else:
             ui.gear.setText("?")     # Fallback
 
+        # Parksensor
+        active = data.get_parksensor_active()  
+        level = data.get_parksensor_level()  
+        distance = data.get_parksensor_distance()
+        ui.update_distance_bar(distance)
+
+        if active and gear < 0: # just when driving in reverse gear
+            ui.parksensor_0.setVisible(level == 0)
+            ui.parksensor_1.setVisible(level == 1)
+            ui.parksensor_2.setVisible(level == 2)
+            ui.parksensor_3.setVisible(level == 3)
+            if (level == 3):
+                ui.distance_bar_bg.show()
+                ui.distance_bar_fill.show()
+            else: 
+                ui.distance_bar_bg.hide()
+                ui.distance_bar_fill.hide()
+        else:
+            ui.parksensor_0.hide()
+            ui.parksensor_1.hide()
+            ui.parksensor_2.hide()
+            ui.parksensor_3.hide()
+            ui.distance_bar_bg.hide()
+            ui.distance_bar_fill.hide()
+      
         # Person Detection
+
         if data.get_person_detected():
             ui.person.show()
             ui.person_distance.show()
@@ -221,8 +233,13 @@ def gui_thread(data: VehicleData):
             ui.person_distance_cm.hide()
 
         # Fuel Range & Level
-        ui.fuel_range.setText(str(int(data.get_fuel_range())))
-        
+        if data.get_info_cnt() == False:
+            ui.info_label.setText("Odometer:")
+            ui.info.setText(str(round(data.get_odometer())))
+        elif data.get_info_cnt() == True:
+            ui.info_label.setText("Range:")
+            ui.info.setText(str(round(data.get_fuel_range())))  
+                
         ui.fuel10.setVisible(data.get_fuel_level() > 90)
         ui.fuel9.setVisible(80 < data.get_fuel_level() <= 90)
         ui.fuel8.setVisible(70 < data.get_fuel_level() <= 80)

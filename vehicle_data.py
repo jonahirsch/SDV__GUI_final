@@ -14,7 +14,7 @@ class VehicleData:
         self._interior_light = False
 
         # gear and speed
-        self._gear = 126
+        self._gear = 126 # P
         self._speed = 0
 
         # person detection
@@ -29,9 +29,11 @@ class VehicleData:
         self._parksensor_level = 0
         self._parksensor_distance = 0
 
-        # Fuel level
+        # Fuel level and odometer
         self._fuel_level = 0
+        self._info_cnt = 0  # to switch between fuel range and odometer
         self._fuel_range = 0
+        self._odometer = 0
 
     # Setter und Getter with thread safety 
     # lock lets only one thread access the data at a time
@@ -164,10 +166,29 @@ class VehicleData:
         with self._lock:
             return self._fuel_level
 
-    def set_fuel_range(self, range: int):
+    def set_info_cnt(self, value: bool):
         with self._lock:
-            self._fuel_range = range
+            self._info_cnt = value
+
+    def get_info_cnt(self):
+        with self._lock:
+            return self._info_cnt
+
+    def toggle_info_cnt(self):
+        self._info_cnt = not self._info_cnt
+
+    def set_fuel_range(self, fuel_range: float):
+        with self._lock:
+            self._fuel_range = fuel_range
 
     def get_fuel_range(self):
         with self._lock:
             return self._fuel_range
+
+    def set_odometer(self, odometer: float):
+        with self._lock:
+            self._odometer = odometer
+
+    def get_odometer(self):
+        with self._lock:
+            return self._odometer
