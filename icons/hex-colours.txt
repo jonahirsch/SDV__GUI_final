@@ -1,9 +1,0 @@
-background: #121212
-
-green: #9fc54e
-
-yellow: #ce7927
-
-red: #fd2d00
-
-blue: #67a9dd
