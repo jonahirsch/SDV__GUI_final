@@ -222,7 +222,7 @@ def gui_thread(data: VehicleData):
       
         # Person Detection
 
-        if data.get_person_detected():
+        if data.get_person_detected() and gear >= 0:
             ui.person.show()
             ui.person_distance.show()
             ui.person_distance_cm.show()
