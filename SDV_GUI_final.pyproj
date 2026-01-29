@@ -42,6 +42,7 @@
     <Content Include="icons\hex-colours.txt" />
     <Content Include="icons\highbeam.JPG" />
     <Content Include="icons\highbeam_button.JPG" />
+    <Content Include="icons\information_btn.jpg" />
     <Content Include="icons\lowbeam.JPG" />
     <Content Include="icons\lowbeam_button.JPG" />
     <Content Include="icons\parki.jpg" />

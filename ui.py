@@ -73,7 +73,7 @@ class SDV_UI(QWidget):
         self.stand_light_btn = self._make_button(584, 452, "icons/stand_button.JPG")
         self.interiorlight_btn = self._make_button(438, 452, "icons/interiorlight_button.JPG")
 
-        self.information_btn = self._make_button_noswitch(438, 306, "icons/information.JPG")
+        self.information_btn = self._make_button_noswitch(438, 306, "icons/information_btn.JPG")
         
         # blinker lights group
         self.blinker_group = [self.blinker_left_btn, self.blinker_right_btn, self.hazard_btn]
