@@ -1,7 +1,6 @@
 ﻿import sys
 import threading
 import time
-import keyboard
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QTimer
 
