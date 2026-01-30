@@ -105,20 +105,17 @@ docker run -it --rm --network kuksa ghcr.io/eclipse-kuksa/kuksa-databroker-cli:m
 
 ### Example CLI commands
 ```bash
-get Vehicle.Speed
+publish Vehicle.Speed 89
 ```
 
 ```bash
-set Vehicle.Speed 50
+get Vehicle.Body.Lights.Beam.High.IsOn
 ```
 
 ```bash
-subscribe Vehicle.Speed
+subscribe Vehicle.Body.Lights.Hazard.IsSignaling
 ```
-
-```bash
-set Vehicle.Body.Lights.Beam.High.IsOn true
-```
+All VSS Signals can be found in the VSS_GUI_Signals.txt attached wihtin the project.
 
 ---
 
