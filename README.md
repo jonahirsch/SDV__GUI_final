@@ -1,5 +1,3 @@
-# SDV_UI_Kuksa
-
 # SDV GUI with KUKSA Databroker
 
 This project provides a Python-based vehicle dashboard GUI built with **PySide6**.  
