@@ -76,23 +76,15 @@ class SDV_UI(QWidget):
         self.blinker_left_btn = self._make_button(584, 306, "blinker_left_button.JPG")
         self.stand_light_btn = self._make_button(584, 452, "stand_button.JPG")
         self.interiorlight_btn = self._make_button(438, 452, "interiorlight_button.JPG")
-        self.information_btn = self._make_button_noswitch(438, 306, "information_btn.jpg")
+        self.information_btn = self._make_button_noswitch(438, 306, "information_btn.JPG")
 
         # ---------------- GROUP LOGIC ----------------
+        # ---------------- GROUP LOGIC (XOR – FIXED) ----------------
         self.blinker_group = [
             self.blinker_left_btn,
             self.blinker_right_btn,
             self.hazard_btn,
         ]
-
-        def toggle_blinker(button):
-            if button.isChecked():
-                for b in self.blinker_group:
-                    if b != button:
-                        b.setChecked(False)
-
-        for b in self.blinker_group:
-            b.clicked.connect(lambda _, btn=b: toggle_blinker(btn))
 
         self.light_group_buttons = [
             self.stand_light_btn,
@@ -100,14 +92,22 @@ class SDV_UI(QWidget):
             self.lowbeam_btn,
         ]
 
-        def toggle_light(button):
-            if button.isChecked():
-                for b in self.light_group_buttons:
-                    if b != button:
-                        b.setChecked(False)
+        def xor_toggle(active_btn, group):
+            if not active_btn.isChecked():
+                return
 
-        for b in self.light_group_buttons:
-            b.clicked.connect(lambda _, btn=b: toggle_light(btn))
+            for btn in group:
+                if btn is not active_btn:
+                    btn.blockSignals(True)
+                    btn.setChecked(False)
+                    btn.blockSignals(False)
+
+        for btn in self.blinker_group:
+            btn.clicked.connect(lambda _, b=btn: xor_toggle(b, self.blinker_group))
+
+        for btn in self.light_group_buttons:
+            btn.clicked.connect(lambda _, b=btn: xor_toggle(b, self.light_group_buttons))
+
 
         # ---------------- IMAGES ----------------
         self.blinker_left = self._make_image(8, 140, "blinker_left.JPG")
