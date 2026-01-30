@@ -78,22 +78,21 @@ class SDV_UI(QWidget):
         self.interiorlight_btn = self._make_button(438, 452, "interiorlight_button.JPG")
         self.information_btn = self._make_button_noswitch(438, 306, "information_btn.jpg")
 
-        # ---------------- GROUP LOGIC ----------------
-        # ---------------- GROUP LOGIC (XOR – FIXED) ----------------
+       # ---------------- GROUP LOGIC (REAL XOR, Qt-safe) ----------------
         self.blinker_group = [
             self.blinker_left_btn,
             self.blinker_right_btn,
             self.hazard_btn,
-        ]
+]
 
         self.light_group_buttons = [
             self.stand_light_btn,
             self.highbeam_btn,
             self.lowbeam_btn,
-        ]
+]
 
-        def xor_toggle(active_btn, group):
-            if not active_btn.isChecked():
+        def xor_toggled(checked, active_btn, group):
+            if not checked:
                 return
 
             for btn in group:
@@ -103,10 +102,11 @@ class SDV_UI(QWidget):
                     btn.blockSignals(False)
 
         for btn in self.blinker_group:
-            btn.clicked.connect(lambda _, b=btn: xor_toggle(b, self.blinker_group))
+            btn.toggled.connect(lambda checked, b=btn: xor_toggled(checked, b, self.blinker_group))
 
         for btn in self.light_group_buttons:
-            btn.clicked.connect(lambda _, b=btn: xor_toggle(b, self.light_group_buttons))
+            btn.toggled.connect(lambda checked, b=btn: xor_toggled(checked, b, self.light_group_buttons))
+
 
 
         # ---------------- IMAGES ----------------
