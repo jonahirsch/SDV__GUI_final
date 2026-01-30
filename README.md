@@ -52,9 +52,23 @@ sudo reboot
 
 ### Install Python and required system libraries
 ```bash
-sudo apt install -y python3 python3-venv python3-pip libgl1 libxkbcommon-x11-0 libxcb-cursor0
+sudo apt install -y python3 python3-venv python3-pip 
 ```
-
+```bash
+sudo apt install -y \
+libgl1 \
+libegl1 \
+libxkbcommon-x11-0 \
+libxcb-cursor0 \
+libxcb-xinerama0 \
+libxcb-icccm4 \
+libxcb-image0 \
+libxcb-keysyms1 \
+libxcb-render-util0 \
+libxcb-shape0 \
+libxcb-sync1 \
+libxcb-xfixes0
+```
 ---
 
 ### Clone repository
