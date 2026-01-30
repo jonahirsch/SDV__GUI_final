@@ -129,7 +129,6 @@ set Vehicle.Body.Lights.Beam.High.IsOn true
   - reads signals from the KUKSA Databroker
   - updates the GUI state
   - publishes GUI button states back to KUKSA
-- Blinkers are simulated at 1.5 Hz
 - All signals follow `Own_GUI_vss.json`
 
 ---
@@ -155,10 +154,6 @@ docker network rm kuksa
 - Not intended for production vehicle systems
 
 ---
-
-## License
-
-Add license information here.
 
 
 
