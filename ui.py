@@ -18,7 +18,7 @@ class SDV_UI(QWidget):
         self.setWindowTitle("SDV UI")
         self.setStyleSheet("background-color: #121212;")
         self.setFixedSize(1024, 600)
-        #self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.FramelessWindowHint)
 
         # ---------------- SPEED ----------------
         self.speed = QLabel("0", self)
