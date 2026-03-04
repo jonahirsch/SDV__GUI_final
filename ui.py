@@ -1,10 +1,10 @@
 ﻿import os
-from PySide6.QtWidgets import QWidget, QPushButton, QLabel
-from PySide6.QtGui import QPixmap, QFont, QIcon
+from PySide6.QtWidgets import QWidget, QPushButton, QLabel, QApplication
+from PySide6.QtGui import QPixmap, QFont, QIcon, QCursor
 from PySide6.QtCore import Qt, QSize
 
 # ============================================================
-# Absolute path handling (VERY IMPORTANT)
+# Absolute path handling
 # ============================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ICON_DIR = os.path.join(BASE_DIR, "icons")
@@ -17,8 +17,22 @@ class SDV_UI(QWidget):
         # ---------------- WINDOW ----------------
         self.setWindowTitle("SDV UI")
         self.setStyleSheet("background-color: #121212;")
+
+        # Fixed Size & Frameless Window
         self.setFixedSize(1024, 600)
         self.setWindowFlags(Qt.FramelessWindowHint)
+
+        # Auto-center on primary screen
+        screen = QApplication.primaryScreen().availableGeometry()
+        x = (screen.width() - self.width()) // 2
+        y = (screen.height() - self.height()) // 2
+        self.move(x, y)
+
+        # Hidden close button (top-right corner)
+        self.hidden_close = QPushButton(self)
+        self.hidden_close.setGeometry(self.width() - 80, 0, 80, 60)
+        self.hidden_close.setStyleSheet("background: transparent; border: none;")
+        self.hidden_close.clicked.connect(QApplication.instance().quit)
 
         # ---------------- SPEED ----------------
         self.speed = QLabel("0", self)
@@ -85,12 +99,6 @@ class SDV_UI(QWidget):
             self.hazard_btn,
 ]
 
-        self.light_group_buttons = [
-            self.stand_light_btn,
-            self.highbeam_btn,
-            self.lowbeam_btn,
-]
-
         def xor_toggled(checked, active_btn, group):
             if not checked:
                 return
@@ -104,11 +112,7 @@ class SDV_UI(QWidget):
         for btn in self.blinker_group:
             btn.toggled.connect(lambda checked, b=btn: xor_toggled(checked, b, self.blinker_group))
 
-        for btn in self.light_group_buttons:
-            btn.toggled.connect(lambda checked, b=btn: xor_toggled(checked, b, self.light_group_buttons))
-
-
-
+        
         # ---------------- IMAGES ----------------
         self.blinker_left = self._make_image(8, 140, "blinker_left.JPG")
         self.blinker_right = self._make_image(247, 140, "blinker_right.JPG")
