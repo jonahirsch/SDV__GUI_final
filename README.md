@@ -117,6 +117,12 @@ Kuksa Databroker connected successfully
 docker run -it --rm --network kuksa ghcr.io/eclipse-kuksa/kuksa-databroker-cli:main --server Server:55555
 ```
 
+If the Databroker hosted on a different networkt (e.g. 192.168.1.1)
+
+```bash
+docker run -it --rm --network kuksa ghcr.io/eclipse-kuksa/kuksa-databroker-cli:main --server 192.168.1.1:55555
+```
+
 ### Example CLI commands
 ```bash
 publish Vehicle.Speed 89
