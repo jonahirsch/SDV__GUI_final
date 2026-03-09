@@ -167,10 +167,10 @@ def gui_thread(data: VehicleData):
         else:
             blink_state = False
 
-    # 1.5 Hz → Toggle alle 333 ms
+    # 1 Hz --> Blinker-Status toggeln
     blinker_timer = QTimer()
     blinker_timer.timeout.connect(toggle_blink_state)
-    blinker_timer.start(333)
+    blinker_timer.start(500)
 
     # =========================
     # UI UPDATE TIMER
